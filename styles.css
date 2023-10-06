@@ -49,6 +49,7 @@ hr {
 
 
 
+ /*   
     .x2 {
        background-color: #eee4da;
        color: #727371; 
@@ -113,9 +114,10 @@ hr {
        background-color: #ff2020;
        color: white;
     }
+*/
 
 
-/*
+
     .x2 {
         color: rgba(0, 0, 0, 0); 
         background-color: #eee4da;
@@ -206,7 +208,7 @@ hr {
         background-image: var(--background-image-url-8192);
         background-size: 100% 100%;
     }
-*/
+
 
 
 /* Animation */
