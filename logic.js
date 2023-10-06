@@ -89,6 +89,53 @@ document.addEventListener('touchmove', (e) => {
     e.preventDefault(); // This line disables scrolling
 }, { passive: false });
 
+
+document.addEventListener('touchend', (e) => {
+    // Check if the element that triggered the event has a class name containing "tile"
+    if (!e.target.className.includes("tile")) {
+        return; // If not, exit the function
+    }
+    
+    // Calculate the horizontal and vertical differences between the initial touch position and the final touch position
+    let diffX = startX - e.changedTouches[0].clientX;
+    let diffY = startY - e.changedTouches[0].clientY;
+
+    // Check if the horizontal swipe is greater in magnitude than the vertical swipe
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+        // Horizontal swipe
+        if (diffX > 0) {
+            slideLeft(); // Call a function for sliding left
+            setTwo(); // Call a function named "setTwo"
+        } else {
+            slideRight(); // Call a function for sliding right
+            setTwo(); // Call a function named "setTwo"
+        }
+    } else {
+        // Vertical swipe
+        if (diffY > 0) {
+            slideUp(); // Call a function for sliding up
+            setTwo(); // Call a function named "setTwo"
+        } else {
+            slideDown(); // Call a function for sliding down
+            setTwo(); // Call a function named "setTwo"
+        }
+    }
+
+    document.getElementById("score").innerText = score;
+        
+    checkWin();
+
+    // Call hasLost() to check for game over conditions
+    if (hasLost()) {
+        // Use setTimeout to delay the alert
+        setTimeout(() => {
+        alert("Game Over! You have lost the game. Game will restart");
+        restartGame();
+        alert("Click any key to restart");
+        // You may want to reset the game or perform other actions when the user loses.
+        }, 100); // Adjust the delay time (in milliseconds) as needed
+    }
+});
 /*
 	// Function that handles the user's keyboard input when they press certain arrow keys.
 	function handleSlide(e) {
@@ -471,64 +518,64 @@ function restartGame(){
 }
 
 
-// document.addEventListener("click", (event) => {
+document.addEventListener("click", (event) => {
 
-//     // Checks if the target of the click is the change-button
-//     if(event.target.id != "change-button"){
-//         return
-//     }
+    // Checks if the target of the click is the change-button
+    if(event.target.id != "change-button"){
+        return
+    }
 
-//     tile02 = document.getElementById("02")
-//     tile04 = document.getElementById("04")
-//     tile08 = document.getElementById("08")
-//     tile16 = document.getElementById("16")
-//     tile32 = document.getElementById("32")
-//     tile64 = document.getElementById("64")
-//     tile128 = document.getElementById("128")
-//     tile256 = document.getElementById("256")
-//     tile512 = document.getElementById("512")
-//     tile1024 = document.getElementById("1024")
-//     tile2048 = document.getElementById("2048")
-//     tile4096 = document.getElementById("4096")
-//     tile8192 = document.getElementById("8192")
+    tile02 = document.getElementById("02")
+    tile04 = document.getElementById("04")
+    tile08 = document.getElementById("08")
+    tile16 = document.getElementById("16")
+    tile32 = document.getElementById("32")
+    tile64 = document.getElementById("64")
+    tile128 = document.getElementById("128")
+    tile256 = document.getElementById("256")
+    tile512 = document.getElementById("512")
+    tile1024 = document.getElementById("1024")
+    tile2048 = document.getElementById("2048")
+    tile4096 = document.getElementById("4096")
+    tile8192 = document.getElementById("8192")
 
-//     if(tile02.value != ''){
-//         document.documentElement.style.setProperty("--background-image-url-02", "url('" + tile02.value + "')");
-//     }
-//     if(tile04.value != ''){
-//         document.documentElement.style.setProperty("--background-image-url-04", "url('" + tile04.value + "')");
-//     }
-//     if(tile08.value != ''){
-//         document.documentElement.style.setProperty("--background-image-url-08", "url('" + tile08.value + "')");
-//     }
-//     if(tile16.value != ''){
-//         document.documentElement.style.setProperty("--background-image-url-16", "url('" + tile16.value + "')");
-//     }
-//     if(tile32.value != ''){
-//         document.documentElement.style.setProperty("--background-image-url-32", "url('" + tile32.value + "')");
-//     }
-//     if(tile64.value != ''){
-//         document.documentElement.style.setProperty("--background-image-url-64", "url('" + tile64.value + "')");
-//     }
-//     if(tile128.value != ''){
-//         document.documentElement.style.setProperty("--background-image-url-128", "url('" + tile128.value + "')");
-//     }
-//     if(tile256.value != ''){
-//         document.documentElement.style.setProperty("--background-image-url-256", "url('" + tile256.value + "')");
-//     }
-//     if(tile512.value != ''){
-//         document.documentElement.style.setProperty("--background-image-url-512", "url('" + tile512.value + "')");
-//     }
-//     if(tile1024.value != ''){
-//         document.documentElement.style.setProperty("--background-image-url-1024", "url('" + tile1024.value + "')");
-//     }
-//     if(tile2048.value != ''){
-//         document.documentElement.style.setProperty("--background-image-url-2048", "url('" + tile2048.value + "')");
-//     }
-//     if(tile4096.value != ''){
-//         document.documentElement.style.setProperty("--background-image-url-4096", "url('" + tile4096.value + "')");
-//     }
-//     if(tile8192.value != ''){
-//         document.documentElement.style.setProperty("--background-image-url-8192", "url('" + tile8192.value + "')");
-//     }
-// })
+    if(tile02.value != ''){
+        document.documentElement.style.setProperty("--background-image-url-02", "url('" + tile02.value + "')");
+    }
+    if(tile04.value != ''){
+        document.documentElement.style.setProperty("--background-image-url-04", "url('" + tile04.value + "')");
+    }
+    if(tile08.value != ''){
+        document.documentElement.style.setProperty("--background-image-url-08", "url('" + tile08.value + "')");
+    }
+    if(tile16.value != ''){
+        document.documentElement.style.setProperty("--background-image-url-16", "url('" + tile16.value + "')");
+    }
+    if(tile32.value != ''){
+        document.documentElement.style.setProperty("--background-image-url-32", "url('" + tile32.value + "')");
+    }
+    if(tile64.value != ''){
+        document.documentElement.style.setProperty("--background-image-url-64", "url('" + tile64.value + "')");
+    }
+    if(tile128.value != ''){
+        document.documentElement.style.setProperty("--background-image-url-128", "url('" + tile128.value + "')");
+    }
+    if(tile256.value != ''){
+        document.documentElement.style.setProperty("--background-image-url-256", "url('" + tile256.value + "')");
+    }
+    if(tile512.value != ''){
+        document.documentElement.style.setProperty("--background-image-url-512", "url('" + tile512.value + "')");
+    }
+    if(tile1024.value != ''){
+        document.documentElement.style.setProperty("--background-image-url-1024", "url('" + tile1024.value + "')");
+    }
+    if(tile2048.value != ''){
+        document.documentElement.style.setProperty("--background-image-url-2048", "url('" + tile2048.value + "')");
+    }
+    if(tile4096.value != ''){
+        document.documentElement.style.setProperty("--background-image-url-4096", "url('" + tile4096.value + "')");
+    }
+    if(tile8192.value != ''){
+        document.documentElement.style.setProperty("--background-image-url-8192", "url('" + tile8192.value + "')");
+    }
+})
