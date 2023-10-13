@@ -1,16 +1,27 @@
-// Declaring our variable for our 2d array, score, row and columns
 let board;
 let score = 0;
 let rows = 4;
 let columns = 4;
 
+let is2048Exist = false;
+let is4096Exist = false;
+let is8192Exist = false;
+
+// Declaring variable used for touch input
 let startX = 0;
 let startY = 0;
 
+
+
+// This will listen to when we touch as screen and assigns the x coordinates of that touch // input to the startX variable and the y coordinates to startY variable 
 document.addEventListener('touchstart', (e) => {
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
 });
+
+
+
+
 
 // Create function to set the gameboard
 function setGame(){
@@ -22,34 +33,41 @@ function setGame(){
         [0, 0, 0, 0]
     ];
 
-	// board = [
-    //     [32, 4, 2, 0],
-    //     [4, 128, 64, 256],
-    //     [8, 32, 16, 2],
-    //     [16, 2, 256, 1024]
-    // ];
+
+    // Create the game board on the HTML document
+    // The first loop is to create rows, the second loop is to create columns
     for(let r=0; r < rows; r++){
         for(let c=0; c < columns; c++){
 
+             // creates a tile using div tag 
             let tile = document.createElement("div");
             
+            // each tile will be assigned with unique ids using row and column values
             tile.id = r.toString() + "-" + c.toString(); 
             
+            // Gets the number value from the board tile
             let num = board[r][c];
             
+            // Update the tile's content and styling based on the value
+            // This will be a function to adjust the content and appearance of the tile based on its number.
             updateTile(tile, num); 
             
+            // Append the tile to the game board container
+            // This means placing the tile inside the grid, in the right row and column
+            // document.getElementById("board") - is targeting the div from the HTML file
             document.getElementById("board").append(tile); 
 
         }
     }
 
+    // For Random Tile
     setTwo();
-    
+   
 }
 
 
 
+// this code function is to assigns a class to the tile based on the submitted  value of the tile through num parameter
 function updateTile(tile, num){
     // clear the tile
     tile.innerText = ""; 
@@ -80,6 +98,7 @@ window.onload = function() {
     setGame();
 }
 
+// UNKNOWN FEATURE
 document.addEventListener('touchmove', (e) => {
 
     if(!e.target.className.includes("tile")){
@@ -87,10 +106,10 @@ document.addEventListener('touchmove', (e) => {
     }
 
     e.preventDefault(); // This line disables scrolling
-}, { passive: false });
-
+}, { passive: false }); // Use passive: false to make preventDefault() work
 
 document.addEventListener('touchend', (e) => {
+    
     // Check if the element that triggered the event has a class name containing "tile"
     if (!e.target.className.includes("tile")) {
         return; // If not, exit the function
@@ -136,32 +155,18 @@ document.addEventListener('touchend', (e) => {
         }, 100); // Adjust the delay time (in milliseconds) as needed
     }
 });
-/*
-	// Function that handles the user's keyboard input when they press certain arrow keys.
-	function handleSlide(e) {
-	    // Checks if the pressed key's code is one of arrow keys on the keyboard.
-	    if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.code)) {
-	        
-	        // Prevent default behavior (scrolling) on keydown
-	        e.preventDefault(); 
-	        
-	        // Depending on which arrow key was pressed, a corresponding function is called.
-	        if (e.code == "ArrowLeft") {
-	            slideLeft();
-	        } else if (e.code == "ArrowRight") {
-	            slideRight();
-	        } else if (e.code == "ArrowUp") {
-	            slideUp();
-	        } else if (e.code == "ArrowDown") {
-	            slideDown();
-	        }
-	    }
-	}
-*/
 
+// SLIDE FEATURE 
+
+// Function that handles the user's keyboard input when they press certain arrow keys.
 function handleSlide(e) {
+    // Checks if the pressed key's code is one of arrow keys on the keyboard.
     if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.code)) {
-        e.preventDefault(); // Prevent default behavior (scrolling) on keydown
+        
+        // Prevent default behavior (scrolling) on keydown
+        e.preventDefault(); 
+        
+        // Depending on which arrow key was pressed, a corresponding function is called.
         if (e.code == "ArrowLeft") {
             slideLeft();
             setTwo();
@@ -175,74 +180,65 @@ function handleSlide(e) {
             slideDown();
             setTwo();
         }
-    }
 
-    document.getElementById("score").innerText = score; 
+        // frequently updates score in every slide
+        document.getElementById("score").innerText = score;     // Update score
 
-    checkWin();
-    if (hasLost()) {
-        // Use setTimeout to delay the alert
-        setTimeout(() => {
-            alert("Game Over! You have lost the game. Game will restart");
-            restartGame();
-            alert("Click any arrow key to restart");
-           
-        }, 100); 
+        checkWin();
 
+        // Call hasLost() to check for game over conditions
+        if (hasLost()) {
+            // Use setTimeout to delay the alert
+            setTimeout(() => {
+                alert("Game Over! You have lost the game. Game will restart");
+                restartGame();
+                alert("Click any arrow key to restart");
+                // You may want to reset the game or perform other actions when the user loses.
+            }, 100); // Adjust the delay time (in milliseconds) as needed
+
+        }
     }
 }
 // When any key is pressed, the handleSlide function is called to handle the key press.
 document.addEventListener("keydown", handleSlide);
 
 
-function filterZero(row){
-    // create new array removing the zeroes
-    return row.filter(num => num != 0) ;
-}
+/*
+	Initial version to prove the function is callable and working
+	function slideLeft(){
+	    console.log("You pressed left")
+	}
 
-// Core function for sliding and merging tiles in a row.
-function slide(row){
-    // row = [0, 2, 2, 2]
-    row = filterZero(row); // get rid of zeroes -> [2, 2, 2]
+	function slideRight() {
+	    console.log("You pressed right")
+	}
 
-    //row = [2, 2, 2]
-    for(let i = 0; i < row.length - 1; i++){
-        if(row[i] == row[i+1]){  
-            row[i] *= 2;       
-            row[i+1] = 0;       
-            score += row[i];    
-        }// [2, 2, 2] -> [4, 0, 2]
-    }
+	function slideUp() {
+	    console.log("You pressed up")
+	}
 
-    row = filterZero(row); //[4, 2]
-
-    // Add zeroes back
-    while(row.length < columns){
-        row.push(0);
-    } // [4, 2, 0, 0]
-
-    return row; // [4,2,0,0]
-}
+	function slideDown() {
+	    console.log("You pressed down")
+	}
+*/
 
 // Responsible for sliding the tiles to the left on the game board.
 function slideLeft(){
     // iterate through each row
     for(let r = 0; r < rows; r++){
-        // The current row is stored in the variable `row`
         let row = board[r] // sample: 0, 2, 2, 2
 
-        let originalRow = row.slice();
+        // This line for animation
+        let originalRow = row.slice(); // store the array in a new variable 
 
         row = slide(row); // call slide function 
         board[r] = row;  // update the value in the array
 
         // Update the id of the tile
-        // For each tile in the row, the code finds the corresponding HTML element by its ID. It then gets the number from the board array at that row and column, and uses the updateTile function to update the content and appearance of the tile.
         for(let c = 0; c < columns; c++){
             let tile = document.getElementById(r.toString() + "-" + c.toString());
             let num = board[r][c];
             updateTile(tile, num)
-
             // Line for animation 
             if (originalRow[c] !== num && num !== 0) {  // if current tile != to the original tile, apply aninmation
                 tile.style.animation = "slide-from-right 0.3s";
@@ -250,10 +246,8 @@ function slideLeft(){
                 setTimeout(() => {
                     tile.style.animation = "";
                 }, 300);
-            } 
-        }
-
-
+            }      
+        } 
     }
 }
 
@@ -274,133 +268,10 @@ function slideRight() {
         for(let c = 0; c < columns; c++){
             let tile = document.getElementById(r.toString() + "-" + c.toString());
             let num = board[r][c];
-            updateTile(tile, num)
+            updateTile(tile, num);
 
-            // Line for animation
-		    if (originalRow[c] !== num && num !== 0) {   // if current tile != to the original tile, apply aninmation
-		        tile.style.animation = "slide-from-left 0.3s";
-		        // Remove the animation class after the animation is complete
-		        setTimeout(() => {
-		            tile.style.animation = "";
-		        }, 300);
-		    }
-        }
-    }
-}
-
-
-function slideUp(){
-    for(let c = 0; c < columns; c++) {
-        let row = [board[0][c], board[1][c], board[2][c], board[3][c]] 
-
-        // For animation
-        let originalRow = row.slice();
-
-        row = slide(row) // [2, 2] -> [4, 0] -> [4, 0, 0, 0]
-        // Check which tiles have changed in this column
-        let changedIndices = [];
-        for (let r = 0; r < columns; r++) { 
-            if (originalRow[r] !== row[r]) {
-                /* 
-                originalRow = [2, 0, 2, 0]
-                row = [4, 0, 0, 0]
-
-                1st iteration: 2 !== 4 (True) changeIndices = [0]
-                2nd iteration: 0 !== 0 (False)
-                3rd iteration: 2 !== 0 (True) changeIndices = [0, 2]
-                4th iteration: 0 !== 0 (False)
-                */
-                changedIndices.push(r);
-            }
-        }
-
-
-
-        // Update the id of the tile
-        for(let r = 0; r < columns; r++){
-            board[r][c] = row[r]
-            let tile = document.getElementById(r.toString() + "-" + c.toString());
-            let num = board[r][c];
-            updateTile(tile, num)
-
-            if (changedIndices.includes(r) && num !== 0) {
-                               
-               tile.style.animation = "slide-from-bottom 0.3s";
-               // Remove the animation class after the animation is complete
-               setTimeout(() => {
-                   tile.style.animation = "";
-               }, 300);
-           }
-}
-    }
-}
-
-
-function slideDown(){
-    for(let c = 0; c < columns; c++) {
-        let row = [board[0][c], board[1][c], board[2][c], board[3][c]] // first column of the board(downwards) =  [2, 0, 2, 0]
-        /*  1st iteration:
-            row = [board[0][0], board[1][0], board[2][0], board[3][0]] 
-            2nd iteration:
-            row = [board[0][1], board[1][1], board[2][1], board[3][1]]
-            3rd iteration:
-            row = [board[0][2], board[1][2], board[2][2], board[3][2]]
-            4th iteration:
-            row = [board[0][3], board[1][3], board[2][3], board[3][3]]
-        */
-
-        // Animation
-        let originalRow = row.slice();
-
-        row.reverse(); // we will reverse the row value since it is downwards. --> [0, 2, 0, 2]
-        row = slide(row); // [2,2] -> [4, 0] -> [4, 0, 0, 0]
-        row.reverse(); // reverse again the newest value of row -> [0, 0, 0, 4] 
-        
-        // Check which tiles have changed in this column
-        let changedIndices = [];
-        for (let r = 0; r < columns; r++) {
-                /* 
-                originalRow = [2, 0, 2, 0]
-                row = [0, 0, 0, 4]
-
-                1st iteration: 2 !== 0 (True) changeIndices = [0]
-                2nd iteration: 0 !== 0 (False)
-                3rd iteration: 2 !== 0 (True) changeIndices = [0, 2]
-                4th iteration: 0 !== 4 (True) changeIndices = [0, 2, 3]
-                */
-
-            if (originalRow[r] !== row[r]) {
-                changedIndices.push(r);
-            }
-        }   // [0, 2, 3]
-
-        // Update the id of the tile
-        for(let r = 0; r < columns; r++){
-            board[r][c] = row[r]
-            /*  Assign each row value for columns
-                1st iteration:
-                board [0][0] = row[0] = 0
-                2nd iteration:
-                board[0][1] = row[1] = 0
-                3rd iteration:
-                board[0][2] = row[2] = 0
-                4th iteration:
-                board[0][3] = row[3] = 4
-            */
-            let tile = document.getElementById(r.toString() + "-" + c.toString());
-            let num = board[r][c];
-            updateTile(tile, num)
-
-            // Animation - Add sliding effect by animating the movement of the tile
-            if (changedIndices.includes(r) && num !== 0) {
-                /*  changeIndices [0, 2, 3]
-                    1st iteration: 0 is in changeIndices, board[0][0] !==0 (False)
-                    2nd iteration: 1 is not changeIndices, board[1][0] (False)
-                    3rd iteration: 2 is in changeIndices, but board[2][0] !== 0 (False)
-                    4th iteration: 3 is in changeIndices, board[3][0] !== 0 (True) (Apply slide-from-top animation to the current tile)
-                */
-
-                tile.style.animation = "slide-from-top 0.3s";
+            if (originalRow[c] !== num && num !== 0) {   // if current tile != to the original tile, apply aninmation
+                tile.style.animation = "slide-from-left 0.3s";
                 // Remove the animation class after the animation is complete
                 setTimeout(() => {
                     tile.style.animation = "";
@@ -409,6 +280,149 @@ function slideDown(){
         }
     }
 }
+
+function slideUp(){
+    for(let c = 0; c < columns; c++) {
+
+        let row = [board[0][c], board[1][c], board[2][c], board[3][c]] // first column of the board(downwards) =  [2, 0, 2, 0]
+        let originalRow = row.slice();
+
+        row = slide(row) // [2, 2] -> [4, 0] -> [4, 0, 0, 0]
+        let changedIndices = [];
+
+        for (let r = 0; r < columns; r++) { 
+            if (originalRow[r] !== row[r]) {
+                changedIndices.push(r);
+            }
+        }
+
+        // Update the id of the tile
+        for(let r = 0; r < columns; r++){
+            board[r][c] = row[r]
+
+            let tile = document.getElementById(r.toString() + "-" + c.toString());
+            let num = board[r][c];
+            updateTile(tile, num)
+
+            
+            // Animation - Add sliding effect by animating the movement of the tile
+            if (changedIndices.includes(r) && num !== 0) {
+                /* changeIndices [0, 2]
+                1st iteration: 0 is in changeIndices, board[0][0] !==0 (True)(Apply slide-from-bottom Animation to the current tile)
+                2nd iteration: 1 is not changeIndices, board[1][0]  (False)
+                3rd iteration: 2 is in changeIndices, but board[2][0] !== 0 (False)
+                4th iteration: 3 is not changeIndices, board[3][0] (False)
+                */
+                tile.style.animation = "slide-from-bottom 0.3s";
+                // Remove the animation class after the animation is complete
+                setTimeout(() => {
+                    tile.style.animation = "";
+                }, 300);
+            }
+        }
+    }
+}
+
+
+
+function slideDown(){
+    for(let c = 0; c < columns; c++) {
+        let row = [board[0][c], board[1][c], board[2][c], board[3][c]] // first column of the board(downwards) =  [2, 0, 2, 0]
+        
+        // Animation
+        let originalRow = row.slice();
+
+        row.reverse();      // we will reverse the row value since it is downwards. --> [0, 2, 0, 2]
+        row = slide(row);   // [2,2] -> [4, 0] -> [4, 0, 0, 0]
+        row.reverse();      // reverse again the newest value of row -> [0, 0, 0, 4] 
+        
+        // Check which tiles have changed in this column
+        let changedIndices = [];
+        for (let r = 0; r < columns; r++) {
+                   
+
+	        if (originalRow[r] !== row[r]) {
+	            changedIndices.push(r);
+	        }
+	    }   // [0, 2, 3]
+
+
+        // Update the id of the tile
+        for(let r = 0; r < columns; r++){
+            board[r][c] = row[r]
+            
+            let tile = document.getElementById(r.toString() + "-" + c.toString());
+            let num = board[r][c];
+            updateTile(tile, num)
+
+            // Animation - Add sliding effect by animating the movement of the tile
+            if (changedIndices.includes(r) && num !== 0) {
+               
+
+                tile.style.animation = "slide-from-top 0.3s";
+                // Remove the animation class after the animation is complete
+                setTimeout(() => {
+                    tile.style.animation = "";
+                }, 300);
+            }
+
+        }
+    }
+}
+
+
+
+
+function filterZero(row){
+    // create new array removing the zeroes
+    return row.filter(num => num != 0) ;
+}
+
+
+// Merge feature
+// Core function for sliding and merging tiles in a row.
+function slide(row){
+    // row = [0, 2, 2, 2]
+    row = filterZero(row); // get rid of zeroes -> [2, 2, 2]
+
+    //row = [2, 2, 2]
+    for(let i = 0; i < row.length - 1; i++){
+        /* 1st iteration:
+        If index 0 == index 1 (2 == 2)
+        (true) index 0 = 2 * 2 (4)
+        Index 1 = 0 (4,0,2)
+
+        2nd iteration:
+        If index 1 == index 2 (0 == 2)
+        (false) index 1 = 0
+        Index 2 = 2 (4,0,2)
+        */
+
+
+
+        if(row[i] == row[i+1]){  
+            row[i] *= 2;       
+            row[i+1] = 0;  
+            score += row[i];       // updates score upon merging
+        } // [2, 2, 2] -> [4, 0, 2]
+
+
+
+    }
+
+    row = filterZero(row); //[4, 2]
+
+    // Add zeroes back
+    while(row.length < columns){
+        row.push(0);
+    } // [4, 2, 0, 0]
+
+    return row; // [4,2,0,0]
+}
+
+
+// EMPTY TILE CHECKER FEATURE
+
 
 // Returns a boolean
 function hasEmptyTile(){
@@ -425,6 +439,8 @@ function hasEmptyTile(){
     return false;
 }
 
+
+// CREATOR OF NEW 2 VALUES
 
 function setTwo(){
     // Check the hasEmptyTile boolean result, if hasEmptyTile == false, the setTwo will not proceed
@@ -455,10 +471,8 @@ function setTwo(){
     }
 }
 
-let is2048Exist = false;
-let is4096Exist = false;
-let is8192Exist = false;
 
+// WIN FEATURE
 function checkWin(){
     // iterate through the board
     for(let r =0; r < rows; r++){
@@ -478,6 +492,7 @@ function checkWin(){
     }
 }
 
+// LOST FEATURE
 function hasLost() {
     // Check if the board is full
     for (let r = 0; r < rows; r++) {
@@ -506,17 +521,18 @@ function hasLost() {
     return true;
 }
 
+// function to restart game after losing
+
+// RestartGame by replacing all values into zero.
 function restartGame(){
     // Iterate in the board and 
     for(let r = 0; r < rows; r++){
         for(let c = 0; c < columns; c++){
-            board[r][c] = 0; // change all values to 0
+            board[r][c] = 0;    // change all values to 0
         }
     }
-    score = 55555; // score reset to 0
-    setTwo()  // new tile   
+    setTwo()    // new tile   
 }
-
 
 document.addEventListener("click", (event) => {
 
